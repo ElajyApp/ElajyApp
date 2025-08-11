@@ -33,7 +33,7 @@ interface InventoryItem {
   supplier: string;
   expiryDate: string; // ISO 8601 string or Date if parsed
   location: string;
-  status: 'normal' | 'low' | 'critical'; // Specific literal types
+  status: 'عادي' | 'منخفض' | 'حرج'; // Specific literal types
 }
 
 // Sample inventory data - will be moved inside component
@@ -63,7 +63,7 @@ export default function PharmacistInventory({ navigateTo, userData }: Pharmacist
       supplier: language === 'ar' ? "شركة إمداد الأدوية" : "MedSupply Inc",
       expiryDate: "2025-06-15",
       location: "A1-B2",
-      status: "normal"
+      status: "عادي"
     },
     {
       id: 2,
@@ -76,7 +76,7 @@ export default function PharmacistInventory({ navigateTo, userData }: Pharmacist
       supplier: language === 'ar' ? "فيتاكور" : "VitaCorr",
       expiryDate: "2025-12-30",
       location: "B2-C1",
-      status: "low"
+      status: "منخفض"
     },
     {
       id: 3,
@@ -89,7 +89,7 @@ export default function PharmacistInventory({ navigateTo, userData }: Pharmacist
       supplier: language === 'ar' ? "فارماكورب" : "PharmaCorp",
       expiryDate: "2024-08-20",
       location: "C1-D3",
-      status: "critical"
+      status: "حرج"
     },
     {
       id: 4,
@@ -102,7 +102,7 @@ export default function PharmacistInventory({ navigateTo, userData }: Pharmacist
       supplier: language === 'ar' ? "شركة إمداد الأدوية" : "MedSupply Inc",
       expiryDate: "2025-03-10",
       location: "A2-B1",
-      status: "normal"
+      status: "عادي"
     }
   ];
   const [editForm, setEditForm] = useState({
@@ -127,28 +127,28 @@ export default function PharmacistInventory({ navigateTo, userData }: Pharmacist
     initialStock: ''
   });
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: InventoryItem['status']) => {
     switch (status) {
-      case 'normal': return { backgroundColor: '#dcfce7', color: '#166534' };
-      case 'low': return { backgroundColor: '#fef3c7', color: '#92400e' };
-      case 'critical': return { backgroundColor: '#fecaca', color: '#991b1b' };
+      case 'عادي': return { backgroundColor: '#dcfce7', color: '#166534' };
+      case 'منخفض': return { backgroundColor: '#fef3c7', color: '#92400e' };
+      case 'حرج': return { backgroundColor: '#fecaca', color: '#991b1b' };
       default: return { backgroundColor: '#f3f4f6', color: '#374151' };
     }
   };
 
-  const getStatusIcon = (status: string) => {
+  const getStatusIcon = (status: InventoryItem['status']) => {
     switch (status) {
-      case 'normal': return 'check-circle';
-      case 'low': return 'warning';
-      case 'critical': return 'error';
+      case 'عادي': return 'check-circle';
+      case 'منخفض': return 'warning';
+      case 'حرج': return 'error';
       default: return 'help';
     }
   };
 
   const filteredItems = inventoryItems.filter(item => {
     switch (selectedFilter) {
-      case 'low': return item.status === 'low';
-      case 'critical': return item.status === 'critical';
+      case 'low': return item.status === 'منخفض';
+      case 'critical': return item.status === 'حرج';
       case 'expiring': return new Date(item.expiryDate) < new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days
       default: return true;
     }
@@ -294,11 +294,11 @@ export default function PharmacistInventory({ navigateTo, userData }: Pharmacist
     }
 
     // Determine status based on initial stock
-    let status: 'normal' | 'low' | 'critical' = 'normal';
+    let status: InventoryItem['status'] = 'عادي';
     if (initialStock <= minStock * 0.5) {
-      status = 'critical';
+      status = 'حرج';
     } else if (initialStock <= minStock) {
-      status = 'low';
+      status = 'منخفض';
     }
 
     // Create new medicine item
@@ -313,7 +313,7 @@ export default function PharmacistInventory({ navigateTo, userData }: Pharmacist
       supplier: newMedicineForm.supplier,
       expiryDate: newMedicineForm.expiryDate,
       location: newMedicineForm.location,
-      status: status
+        status: status
     };
 
     // Add to inventory
@@ -375,7 +375,7 @@ export default function PharmacistInventory({ navigateTo, userData }: Pharmacist
               <View style={styles.summaryCardRow}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.summaryLabel}>{t('pharmacist.inventory.lowStock')}</Text>
-                  <Text style={styles.summaryValue}>{inventoryItems.filter(item => item.status === 'low').length}</Text>
+                  <Text style={styles.summaryValue}>{inventoryItems.filter(item => item.status === 'منخفض').length}</Text>
                 </View>
                 <View style={styles.summaryIconBox}>
                   <Icon name="warning" size={24} color="#49C5B8" />
@@ -387,7 +387,7 @@ export default function PharmacistInventory({ navigateTo, userData }: Pharmacist
               <View style={styles.summaryCardRow}>
                 <View style={{ flex: 1 }}>
                   <Text style={styles.summaryLabel}>{t('pharmacist.inventory.outOfStock')}</Text>
-                  <Text style={styles.summaryValue}>{inventoryItems.filter(item => item.status === 'critical').length}</Text>
+                  <Text style={styles.summaryValue}>{inventoryItems.filter(item => item.status === 'حرج').length}</Text>
                 </View>
                 <View style={styles.summaryIconBox}>
                   <Icon name="error" size={24} color="#49C5B8" />
@@ -464,7 +464,7 @@ export default function PharmacistInventory({ navigateTo, userData }: Pharmacist
                   <View style={[styles.statusBadge, getStatusColor(item.status)]}>
                     <Icon name={getStatusIcon(item.status)} size={14} color={getStatusColor(item.status).color} />
                     <Text style={[styles.statusText, { color: getStatusColor(item.status).color }]}>
-                      {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                      {item.status}
                     </Text>
                   </View>
                 </View>
